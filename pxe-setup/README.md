@@ -163,3 +163,62 @@ Create **/etc/ethers** and **/etc/dnsmasq.hosts**.
 ```sh
 touch /etc/ethers /etc/dnsmasq.hosts
 ```
+
+## French Keyboard Layout
+
+### For Grub
+
+Generate a suitable Keyboard layout for Grub.
+
+```sh
+mkdir -p /var/lib/tftpboot/EFI/centos/layouts
+gunzip -c /usr/lib/kbd/keymaps/xkb/fr.map.gz |grub2-mklayout -o /var/lib/tftpboot/EFI/centos/layouts/fr.gkb
+```
+
+Edit **/var/lib/tftpboot/grub.cfg** and add the following lines.
+
+```
+insmod keylayouts
+insmod at_keyboard
+terminal_input at_keyboard
+keymap fr
+```
+
+### For Syslinux
+
+```sh
+curl -Lo syslinux.tgz https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
+tar zxvf syslinux.tgz
+cd syslinux-6.03
+cat > patch <<"EOF"
+diff --git a/utils/keytab-lilo b/utils/keytab-lilo
+index 9e34160..337a869 100755
+--- a/utils/keytab-lilo
++++ b/utils/keytab-lilo
+@@ -48,9 +48,9 @@ sub load_map
+     $empty = 1;
+     while (<FILE>) {
+ 	chop;
+-	if (/^(static\s+)?u_short\s+(\S+)_map\[\S*\]\s+=\s+{\s*$/) {
++	if (/^(static\s+)?(u_|unsigned )short\s+(\S+)_map\[\S*\]\s+=\s+{\s*$/) {
+ 	    die "active at beginning of map" if defined $current;
+-	    $current = $pfx.":".$2;
++	    $current = $pfx.":".$3;
+ 	    next;
+ 	}
+ 	undef $current if /^};\s*$/;
+EOF
+patch -p1 < patch
+./utils/keytab-lilo -p 60=46 -p 92=60 -p 124=62 /usr/lib/kbd/keymaps/legacy/i386/qwerty/us.map.gz /usr/lib/kbd/keymaps/legacy/i386/azerty/fr-pc.map.gz > /var/lib/tftpboot/fr-pc.ktl
+```
+
+Edit **/var/lib/tftpboot/pxelinux.cfg/default** and add the following lines.
+
+```
+KBDMAP fr-pc.ktl
+```
+
+More details here:
+- https://wiki.archlinux.fr/syslinux
+- http://ix.io/n0p
+
