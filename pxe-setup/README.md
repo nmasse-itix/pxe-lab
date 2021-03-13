@@ -143,3 +143,23 @@ firewall-cmd --reload
 
 Create **/var/www/lighttpd/auto-ks.cfg** from [auto-ks.cfg](auto-ks.cfg).
 
+## DNS Setup
+
+Update **/etc/dnsmasq.conf**.
+
+```
+# DNS
+auth-zone=itix.lab,192.168.23.0/24
+auth-server=ns.itix.lab,
+auth-ttl=60
+expand-hosts
+no-hosts
+addn-hosts=/etc/dnsmasq.hosts
+domain=itix.lab
+```
+
+Create **/etc/ethers** and **/etc/dnsmasq.hosts**.
+
+```sh
+touch /etc/ethers /etc/dnsmasq.hosts
+```
