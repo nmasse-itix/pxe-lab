@@ -51,3 +51,29 @@ sudo virsh destroy pxe-client-bios
 sudo virsh undefine pxe-client-bios
 sudo rm /var/lib/libvirt/images/pxe-client-bios.qcow2
 ```
+
+## Test PXE automated install
+
+Test the PXE automated install of a BIOS client.
+
+```sh
+sudo virt-install -n pxe-client-bios --memory 2048 --vcpus=1 --os-variant=centos8 --accelerate -v --disk path=/var/lib/libvirt/images/pxe-client-bios.qcow2,size=10 --pxe --network network=pxe-lab,mac=52:54:00:88:a4:b0
+```
+
+Test the PXE automated install of a UEFI client.
+
+```sh
+sudo virt-install -n pxe-client-uefi --memory 2048 --vcpus=1 --os-variant=centos8 --accelerate -v --disk path=/var/lib/libvirt/images/pxe-client-uefi.qcow2,size=10 --pxe --network network=pxe-lab,mac=52:54:00:88:a4:b0 --boot uefi
+```
+
+Clean up.
+
+```sh
+sudo virsh destroy pxe-client-uefi
+sudo virsh undefine --nvram pxe-client-uefi
+sudo rm /var/lib/libvirt/images/pxe-client-uefi.qcow2
+
+sudo virsh destroy pxe-client-bios
+sudo virsh undefine pxe-client-bios
+sudo rm /var/lib/libvirt/images/pxe-client-bios.qcow2
+```
